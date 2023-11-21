@@ -78,5 +78,5 @@ conda activate pdal
 python torch_points3d/core/data_transform/pdal/run_pipeline.py $path_to_test_data $n_process $height_filter 1.0
 
 echo "Predecting with 3D CNN"
-conda activate msc
+conda activate powerlines
 python eval_to_las.py $data_path $model_path $model_metric ""
