@@ -1,0 +1,63 @@
+# @package data
+defaults:
+  - regression/default
+
+class: nfi.BiomassDataset
+name: NFIBiomass
+task: regression
+dataroot: data
+apply_rotation: True
+store_samples: False
+first_subsampling: 0.025
+# if samples are stored, you need to reprocess file when you change anything below (until transforms)
+same_year_only: False
+merge_val_set: False
+first_return_only: False
+targets: ["BMag_ha", "V_ha"]
+features: ["return_num","num_returns","temp_diff_years"]
+stats: ["h_mean_1_", "h_q95_1_", "IR_"]
+train_transform:
+  - transform: RandomDropout
+    params:
+      dropout_ratio: 0.2
+  - transform: RandomNoise
+    params:
+      sigma: 0.001
+  - transform: Random3AxisRotation
+    params:
+      apply_rotation: ${data.apply_rotation}
+      rot_x: 0
+      rot_y: 0
+      rot_z: 359
+  - transform: RectangleExtend
+    params:
+      e_x: 0.7071067811865475 #1/2**.5
+      e_y: 0.7071067811865475 #1/2**.5
+      e_z: 100
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+test_transform:
+  - transform: RectangleExtend
+    params:
+      e_x: 0.7071067811865475 #1/2**.5
+      e_y: 0.7071067811865475 #1/2**.5
+      e_z: 100
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+val_transform: ${data.test_transform}

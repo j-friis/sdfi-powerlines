@@ -1,0 +1,69 @@
+# @package data
+defaults:
+  - regression/default
+
+class: nfi.BiomassDataset
+name: NFIBiomass
+task: regression
+dataroot: data
+apply_rotation: True
+first_subsampling: 0.025
+store_samples: True
+# if samples are stored, you need to reprocess file when you change anything below (until transforms)
+same_year_only: False
+merge_val_set: False
+first_return_only: False
+targets: ["BMag_ha", "V_ha"]
+features: ["return_num","num_returns","temp_diff_years"]
+stats: ["h_mean_1_", "h_q95_1_", "IR_"]
+pre_collate_transform:
+    - transform: SaveOriginalPosId    # Required so that one can recover the original point in the fused point cloud
+    - transform: GridSampling3D       # Samples on a grid
+      params:
+          size: ${data.first_subsampling}
+train_transform:
+  - transform: RandomDropout
+    params:
+      dropout_ratio: 0.2
+  - transform: RandomNoise
+    params:
+      sigma: 0.001
+  - transform: Random3AxisRotation
+    params:
+      apply_rotation: ${data.apply_rotation}
+      rot_x: 0
+      rot_y: 0
+      rot_z: 359
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+  - transform: ShiftVoxels
+test_transform:
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+val_transform: ${data.test_transform}

@@ -1,0 +1,85 @@
+# @package data
+defaults:
+  - segmentation/default
+
+class: denmark_pl_hough.DenmarkDataset
+name: "Denmark"
+task: segmentation
+dataroot: /home/xdr476/data
+processed_folder: "processed_hough_20cm"
+use_category: False
+visualization: True
+class_weights: log
+first_subsampling: 0.008 #0.04 for 50m
+train_overlap: 0.25
+block_size_x: 0.025  # tuple for normalized sampling area (e.g., if 1km = 1, 200m = 0.2) 0.05
+block_size_y: 0.025 # tuple for normalized sampling area (e.g., if 1km = 1, 200m = 0.2) 0.05
+canny_lower: 20
+canny_upper: 168
+cc_area: 5135
+hough_lines_treshold: 82
+max_line_gap: 15
+min_line_length: 6
+meters_around_line: 6
+simplify_tolerance: 8
+small_dialation_kernel: 5
+outlier_voxel_size: 0.7
+outlier_nb_neighbors: 20
+outlier_std_ratio: 34
+train_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+
+val_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+
+test_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: XYZFeature
+    params:
+      add_x: False
+      add_y: False
+      add_z: True
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [True]
+      feat_names: [pos_z]
+      delete_feats: [True]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+

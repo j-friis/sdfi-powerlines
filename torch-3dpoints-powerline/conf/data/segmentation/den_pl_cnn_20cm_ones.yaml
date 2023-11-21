@@ -1,0 +1,71 @@
+# @package data
+defaults:
+  - segmentation/default
+
+class: denmark_pl_cnn.DenmarkDataset
+name: "Denmark"
+task: segmentation
+dataroot: /home/xdr476/data
+processed_folder: "processed_cnn_20_ones"
+use_category: False
+visualization: True
+class_weights: log
+first_subsampling: 0.008 #0.04 for 50m
+train_overlap: 0.25
+block_size_x: 0.025  # tuple for normalized sampling area (e.g., if 1km = 1, 200m = 0.2) 0.05
+block_size_y: 0.025 # tuple for normalized sampling area (e.g., if 1km = 1, 200m = 0.2) 0.05
+outlier_voxel_size: 0.7
+outlier_nb_neighbors: 20
+outlier_std_ratio: 34
+path_to_model: "/home/xdr476/master-thesis/torch-3dpoints-powerline/models/preprocess_CNN/cnnStateDict.pth"
+network_size: 128
+image_size: 4096
+meters_around_line: 12
+simplify_tolerance: 8
+cc_area: 5000
+train_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: AddOnes
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [ True]
+      feat_names: [ ones ]
+      delete_feats: [ True ]
+      input_nc_feats: [ 1 ]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+val_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: AddOnes
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [ True]
+      feat_names: [ ones ]
+      delete_feats: [ True ]
+      input_nc_feats: [ 1 ]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+test_transform:
+  - transform: MinPoints
+    lparams: [ 512 ]
+  - transform: AddOnes
+  - transform: AddFeatsByKeys
+    params:
+      list_add_to_x: [ True]
+      feat_names: [ ones ]
+      delete_feats: [ True ]
+      input_nc_feats: [ 1 ]
+  - transform: GridSampling3D
+    params:
+      size: ${data.first_subsampling}
+      quantize_coords: True
+      mode: "last"
+
