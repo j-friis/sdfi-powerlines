@@ -1,21 +1,21 @@
-# Master Thesis
+#  sdfi-powerlines
 
-## Install the python requirements with with conda
 
-First create a conda environment
+## Install the two python envoriments using the install files in ./install
 
+Change directory into the folder 
 ```bash
-conda create --name $name python=3.8
+cd install
 ```
 
-Activate the environment
+Install the first environment(pdal)
 
 ```bash
-conda activate $name
+bash install_pdal_env.sh 
 ```
 
-Install the dependencies
+Install the second environment(powerlines). For this env you need to have cuda installed on your PC, and set the correct path in file like this `export CUDA_HOME=/usr/local/cuda` 
 
 ```bash
-pip install -r requirements.txt
+bash install_powerlines_env.sh 
 ```
